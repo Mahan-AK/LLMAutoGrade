@@ -1,0 +1,14 @@
+{
+  "assignment_id": "1",
+  "solution_pdf_path": "Model_Solutions/Assignment_1/Assignment_1_Solution.pdf",
+  "solution_text_path": "Model_Solutions/Assignment_1/solution_text.txt",
+  "structure_hint_path": "Model_Solutions/Assignment_1/structure_hint_assignment_1.txt",
+  "solution_images": [
+    "Model_Solutions/Assignment_1/pages/model_solution_page_1.png",
+    "Model_Solutions/Assignment_1/pages/model_solution_page_2.png",
+    "Model_Solutions/Assignment_1/pages/model_solution_page_3.png",
+    "Model_Solutions/Assignment_1/pages/model_solution_page_4.png",
+    "Model_Solutions/Assignment_1/pages/model_solution_page_5.png"
+  ],
+  "parsed_solution_path": "Model_Solutions/Assignment_1/parsed_solution_1.md"
+}

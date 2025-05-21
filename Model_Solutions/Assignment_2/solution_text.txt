@@ -1,0 +1,836 @@
+Foundations of data science
+A MIT R ANA , B ASTIAN S CHNEIDER , G ERD M UND , P ENELOPE M ÜCK ,
+J ONATHAN L ENNARTZ , A NNIKA TARNOWSKI & M ICHAEL N ÜSKEN
+
+2. Exercise sheet
+Handin as announced on eCampus
+fits to 03
+
+Exercise 2.1 (Prove a Chernoff bound).
+
+(0+10 points)
+
+In several steps you shall prove the
+
+t
+
+!
+Theorem (Chernoff, positive part). Let X = i<n Xi with independent,
+p-biased Bernoulli variables Xi ←− {0, 1} with prob (Xi = 1) = p.
+" #
+Let ε ∈ 0, 12 . Then for some constant c > 0 we have
+2
+
+b-i
+
+prob (X − E X ≥ ε E X) ≤ e−cε E X .
+
+(i) Compute E X.
+Solution.
+
++1
+
+By the linearity of the expected value, we have that
+&
+$ n
+n
+%
+%
+E(Xi ).
+E(X) = E
+Xi =
+i=1
+
+i=1
+
+A simple computation shows that E(Xi ) = p, such that
+E(X) =
+
+n
+%
+
+p = np.
+
+i=1
+
+(ii) For α > 0 compute E eαX .
+[Do not forget to reason!]
+Solution.
+
+At first, one can compute
+eαX = eα
+
+!n
+
+i=1 Xi
+
+=
+
+n
+'
+
+eαXi .
+
+i=1
+
+Now as the Xi are independent, so are the variables eαXi . Hence
+&
+$ n
+n
+'
+'
+(
+)
+αX
+αXi
+E eαXi .
+=
+E(e ) = E
+e
+i=1
+
+i=1
+
+⃝
+
++3
+
+14
+
+Amit, Bastian, Gerd, Penelope, Jonathan, Annika & Michael
+It remains to compute
+(
+)
+E eαXi = prob (Xi = 1) · eα·1 + prob (Xi = 0) · eα·0
+= p · eα + (1 − p) · 1 = 1 + p(eα − 1),
+so that overall we obtain
+
+n
+(
+) '
+(1 + p(eα − 1)) = (1 + p(eα − 1))n
+E eαX =
+i=1
+
++1
+
+⃝
+
+(iii) Use 1 + x ≤ ex to estimate E eαX by eβnp for some β.
+Solution.
+
+If we use x = p(eα − 1) and apply the inequality, we obtain
+α
+
+Hence
+
+1 + p(eα − 1) ≤ ep(e −1) .
+α
+
+α
+
+E(eαX ) = (1 + p(eα − 1))n ≤ (ep(e −1) )n = enp(e −1) ,
+
++3
+
+⃝
+
+b-i
+t
+
+so for β = (eα − 1) we obtain the desired result.
+
+(iv) Prove
+eα − 1 − α(1 + ε) ≤ − 13 ε2 for a suitable α and for each
+#
+" that
+ε ∈ 0, 12 .
+Solution.
+
+We start by noting, that eα − 1 − α(1 + ε) ≤ − 31 ε2 is equivalent to
+
+1
+eα − 1 − α(1 + ε) + ε2 ≤ 0.
+3
+If we consider the left hand side as a function of α, we can compute that the minimum is obtained at α = ln(1 + ε). Because of this we will consider α = ln(1 + ε)
+and it remains to show that for any ε in question
+
+1
+1
+f (ε) = eln(1+ε) − 1 − ln(1 + ε)(1 + ε) + ε2 = ε − ln(1 + ε)(1 + ε) + ε2 ≤ 0.
+3
+3
+We "can compute
+that f (0) = 0, so our aim will be to show, that f ′ (ε) ≤ 0 for
+#
+ε ∈ 0, 12 such that the function f (ε) will decrease (or stay constant) and hence be
+0 or negative in the given interval.
+Computing f ′ yields
+
+f ′ (ε) = 1 −
+
+1+ε
+2
+2
+− ln(1 + ε) + ε = ε − ln(1 + ε).
+1+ε
+3
+3
+
+Again we have f ′ (0) = 0 and it’s not immediate to see that f ′ (ε) ≤ 0. But if we
+compute the second derivative, we have
+
+1
+2
+,
+f ′′ (ε) = −
+3 1+ε
+"
+#
+which is negative for ε ∈ 0, 21 . So in this interval, f ′ (ε) will be a decreasing
+function, and as it starts at 0, it will be negative. So also f will be a "decreasing
+#
+function and as it starts at 0 as well, it will be negative throughout ε ∈ 0, 12 .
+"
+#
+So indeed, the given inequality holds for α = ln(1 + ε) and ε ∈ 0, 21 .
+⃝
+
+Foundations of data science
+
+15
+
+For confirmation:
+0.1 · f ′′ (ε)
+0
+0
+
+0.5
+
+1.0
+
+ε
+
+1.5
+
+f (ε)
+f ′ (ε)
+−0.05
+
+(v) Apply Markov’s inequality for Z = eαX to prove the theorem.
+Solution.
+
++2
+
+What we want to prove is that
+prob (X − E X ≥ ε E X) ≤ e−cε E X .
+
+t
+
+2
+
+To transform the probability into a form such that we can apply Markov, we calculate
++
+*
+prob (X − E X ≥ ε E X) = prob (X ≥ (1 + ε) E X) = prob eαX ≥ eα(1+ε) E X ,
+
+b-i
+
+where the last equality holds as α > 0, such that eαx is a monotone increasing
+function in x.
+
+But Z = eαX is now a positively distributed random variable, such that we can
+apply Markov’s inequality:
+*
++
+*
++
+prob eαX ≥ eα(1+ε) E X = prob Z ≥ eα(1+ε) E X ≤
+
+E(Z)
+.
+eα(1+ε) E X
+
+But we have already estimated E(Z) and inserting this leads to
+α
+
+α
+e(e −1) E X
+≤
+= e((e −1)−(α(1+ε))) E X .
+eα(1+ε) E X
+eα(1+ε) E X
+
+E(Z)
+
+Now we can use our inequality from the previous part and the fact that et E(X) is a
+positive monotone increasing function in t, to conclude that
+α
+
+e((e −1)−(α(1+ε))) E X ≤ e− 3 ε E X = e−cε E X ,
+1 2
+
+2
+
+for c = 31 .
+
+You may want to consider the negative part, namely that also
+2
+
+prob (X − E X ≤ −ε E X) ≤ e−cε E X .
+
+Hint: α < 0 does help.
+
+⃝
+
++0
+
+16
+
+Amit, Bastian, Gerd, Penelope, Jonathan, Annika & Michael
+fits to 03
+
+Exercise 2.2 (Annuli).
+
+(7 points)
+
+1
+(i) Compute and estimate the volume of the 100
+-annulus compared to
+d
+the volume of the d-dimensional ball B .
+
+1
+
+Solution. By the formula from the lecture we know that the volume of the annulus of width ε of the d-dimensional ball, here denoted Adε , is
+( )
+d
+vol Adε = vol(B d ) − (1 − ε) vol(B d ).
+
+1
+So for ε = 100
+we obtain
+
+-d
+,
+*
++
+1
+vol Ad 1 = vol(B d ) − 1 −
+vol(B d ),
+100
+100
+
+b-i
+t
+
+so compared to the d-dimensional ball we have
+*
++
+-d
+,
+vol Ad 1
+1
+1
+100
+≥ 1 − e− 100 d .
+=1− 1−
+d
+vol(B )
+100
+
+So especially we have
+
+1
+
++
+*
+vol Ad 1
+d→∞
+100
+−−−→ 1.
+vol(B d )
+
+⃝
+
+(ii) Compute and estimate the volume of the √1d -annulus compared to
+the volume of the d-dimensional ball B d .
+Solution.
+
+With the same formula as above, for ε = √1d we obtain
+*
+
+d
+
+vol A √1
+
+d
+
++
+
+,
+-d
+1
+= vol(B ) − 1 − √
+vol(B d ),
+d
+d
+
+so compared to the d-dimensional ball we have
+,
+d
+,
+-d
+vol A √1
+√
+1
+d
+− √1 d
+− d
+d
+√
+=
+1
+−
+1
+−
+≥
+1
+−
+e
+=
+1
+−
+e
+.
+vol(B d )
+d
+
+So especially, we have
+
+,
+vol Ad√1
+d
+
+vol(B d )
+
+1
+
+d→∞
+
+−−−→ 1.
+
+⃝
+
+(iii) Compute and estimate the volume of the d12 -annulus compared to
+the volume of the d-dimensional ball B d .
+
+17
+
+Foundations of data science
+
+Solution.
+
+With the same formula as above, for ε = d12 we obtain
+,
+-d
++
+*
+1
+vol(B d ),
+vol Ad1 = vol(B d ) − 1 − 2
+d2
+d
+
+so compared to the d-dimensional ball we have
+*
++
+-d
+,
+vol Ad1
+1
+1
+1
+d2
+=
+1
+−
+1
+−
+≥ 1 − e− d2 d = 1 − e− d .
+d
+2
+vol(B )
+d
+Actually applying an appropriate upper bound we find
+*
++
+vol Ad1
+d→∞
+d2
+−−−→ 0.
+vol(B d )
+
+⃝
+
+Solution.
+
+2
+
+t
+
+(iv) Plot the three functions and the relative volume of the d1 -annulus for
+d = 1..20.
+
+√
+
+(ii) √1 -annulus, 1 − e− d
+
+1
+
+b-i
+
+d
+
+1 -annulus, 1 − e−1
+d
+
+−1
+(iii) 12 -annulus, 1 − e d
+d
+
+− 1 d
+100
+
+1 -annulus, 1 − e
+(i) 100
+
+0
+
+0
+
+5
+
+10
+
+15
+
+20
+
+d
+
+Here, the true functions are drawn as solid lines, the estimates as dashed lines. ⃝
+
+(v) For which ε does the ε-annulus have at least 99% of the ball volume?
+Solution. If we consider the previous picture, the graph in which we have control of both lower and higher dimensions, is the graph of ε = d1 . The idea now is
+to consider ε = dc to get a different constant. We compute that the volume of the
+annulus compared to the ball itself is
+*
+c +d
+(1 − 1 −
+) ≥ 1 − e−c .
+d
+
+2
+
+18
+
+Amit, Bastian, Gerd, Penelope, Jonathan, Annika & Michael
+To obtain 1 − e−c ≥ 0.99, we need to solve e−c ≤ 0.01. As the exponential function
+is monotone increasing, this is equivalent to
+−c ≤ ln(0.01) ⇔ c ≥ ln(100).
+So especially for c = ln(100) = 4.605 we have that an ε = dc -annulus contains
+more than 99% of the volume of any d-dimensional ball.
+⃝
+
+fits to 04
+
+Exercise 2.3 (Gamma).
+4
+
+(i) Prove that Γ
+
+(1)
+2
+
+(8+4 points)
+
+=
+
+√
+
+π.
+
+Hint: Change the variable and use
+
+.∞
+
+2
+
+e−x dx =
+
+−∞
+
+√
+
+π.
+
+b-i
+t
+
+Solution. We are combining a few elementary transformations on integrals to
+obtain that. It needs one ‘standard’ substitution and one trick.
+, - / ∞
+1
+1
+Γ
+=
+x 2 −1 e−x dx
+2
+0
+/ ∞
+x=y 2 ,
+2
+dx=2y dy
+========
+y −1 e−y 2y dy
+0
+/ ∞
+√
+2
+=
+e−y dy = π.
+⃝
+−∞
+
++4
+
+(ii) Prove that
+
+.∞
+
+2
+
+−∞
+
+e−x dx =
+
+√
+
+π.
+.
+
+2
+
+2
+
+Hint: To that end consider R2 e−(y +z ) dy dz. Use the substitution
+y = r cos(ϕ), z = r sin(ϕ) to express this with polar coordinates.
+Solution. For computing this integral the simplest way I know is to square it:
+/ ∞
+/ ∞
+/
+2
+2
+2
+2
+e−(y +z ) dy dz
+e−y dy ·
+e−z dz =
+−∞
+
+−∞
+
+R2
+
+(y,z)=(r cos ϕ,r sin ϕ)
+dy dz=r dr dϕ
+
+===============
+=
+
+/ ∞
+0
+
+0
+
+2re−r
+1
+2 ∞
+
+0
+= −e−r
+2 34
+
+=1
+
+=π
+and thus
+
+.∞
+
+−∞
+
+2
+
+e−y dy =
+
+√
+π.
+
+/ 2π / ∞
+
+0
+
+2
+
+5
+
+1
+dr ·
+2
+
+/ 2π
+
+2
+
+e−r r dr dϕ
+
+0
+
+dϕ
+
+0
+
+·π
+
+⃝
+
+Foundations of data science
+
+(iii) Recall the formula for integration by parts (look it up if need be. . . ),
+.b
+f (x)g ′ (x) dx = . . . , where f and g are any suitably nice functions.
+a
+Use this formula to show that indeed Γ(z + 1) = zΓ(z).
+
+Solution. We split the integrand into the parts xz with derivate zxz−1 and e−x
+with anti-derivative −e−x :
+Γ(z + 1) =
+
+/ ∞
+0
+
+#
+
+(z+1)−1 −x
+x
+e
+dx
+2 34 5 2345
+=:f ↓
+
+=:g↑
+
+"∞
+= −xz e−x 0 +z
+2
+34
+5
+=0
+
+/ ∞
+
+xz−1 e−x dx = zΓ(z).
+
+⃝
+
+0
+
+fits to 04
+
+Consider an n-simplex
+6
+∆n =
+
+x∈R
+
+n
+
+(4 points)
+
+t
+
+Exercise 2.4 (Simplices).
+
+4
+
+∃xi ∈ R≥0 : x =
+
+%
+
+xi ei ,
+
+%
+
+7
+
+xi ≤ 1 .
+
+b-i
+
+4
+
+19
+
+0≤i<n
+
+0≤i<n
+
+Estimate its near surface volume ∆n \ (c + (1 − ε)(∆n − c)) with c =
+centroid(e0 , . . . , en−1 , 0) relative to its volume.
+Solution.
+
+From the lecture we know that for A ⊂ Rd , ε ∈ [0, 1] with (1 − ε)A ⊂ A
+vol((1 − ε)A) = (1 − ε)d vol(A) and
+vol(A \ (1 − ε)A) = vol(A) − vol((1 − ε)A).
+
+To proof the claim shift the coordinate system such that the centroid c of the simplex is the
+
+1
+
+!
+
+c
+
+0
+
+0
+
+1
+
+Figure 2.1: 2-simplex with centroid c
+origin. In this shifted coordinate system c = 0 and we have (c+(1−ε)(∆n −c)) = (1−ε)∆n
+
+20
+
+Amit, Bastian, Gerd, Penelope, Jonathan, Annika & Michael
+
+and (1 − ε)∆n ⊂ ∆n . If we consider the relative volume and use the above equations we
+get
+
+vol(∆n \ (c + (1 − ε)(∆n − c))
+vol((1 − ε)∆n )
+=1−
+vol(∆n )
+vol(∆n )
+= 1 − (1 − ε)d
+
+⃝
+
+b-i
+t
+
+≥ 1 − e−εd .
+
+
