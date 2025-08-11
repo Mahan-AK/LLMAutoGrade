@@ -4,6 +4,7 @@ import os
 import sys
 import json
 import time
+import glob
 import shutil
 import argparse
 import subprocess
@@ -27,14 +28,14 @@ def parse_arguments():
     )
     
     parser.add_argument(
-        '--solution_pdf_path',
+        '--solution_pdf',
         type=Path,
         required=True,
         help='Path to the solution PDF file'
     )
     
     parser.add_argument(
-        '--structure_hint_path',
+        '--structure_hint',
         type=Path,
         required=True,
         help='Path to the structure hint file'
@@ -57,10 +58,10 @@ def parse_arguments():
     args = parser.parse_args()
     
     # Validate input files exist
-    if not args.solution_pdf_path.exists():
-        parser.error(f"Solution PDF file not found: {args.solution_pdf_path}")
-    if not args.structure_hint_path.exists():
-        parser.error(f"Structure hint file not found: {args.structure_hint_path}")
+    if not args.solution_pdf.exists():
+        parser.error(f"Solution PDF file not found: {args.solution_pdf}")
+    if not args.structure_hint.exists():
+        parser.error(f"Structure hint file not found: {args.structure_hint}")
     if not args.api_key:
         parser.error(f"API key not provided")
     
@@ -83,6 +84,7 @@ def get_pdf_page_count(pdf_path: Path) -> int:
 
 def convert_pdf_to_images(pdf_path: Path, pages_dir: Path, num_pages: int):
     """Convert PDF pages to images."""
+    
     for i in range(1, num_pages + 1):
         output_prefix = pages_dir / "model_solution_page_tmp"
         subprocess.run([
@@ -94,8 +96,25 @@ def convert_pdf_to_images(pdf_path: Path, pages_dir: Path, num_pages: int):
             str(output_prefix)
         ], check=True)
         
-        old_name = f"{output_prefix}-{i}.png"
+        # pdftoppm uses zero-padded page numbers when there are >= 10 pages
+        if num_pages >= 10:
+            page_suffix = f"{i:02d}"
+        else:
+            page_suffix = str(i)
+        
+        old_name = f"{output_prefix}-{page_suffix}.png"
         new_name = pages_dir / f"model_solution_page_{i}.png"
+        
+        # Check if the expected file exists, if not try to find it with glob
+        if not os.path.exists(old_name):
+            # Fallback: search for any file matching the pattern
+            pattern = f"{output_prefix}-*{i}.png"
+            matching_files = glob.glob(pattern)
+            if matching_files:
+                old_name = matching_files[0]
+            else:
+                raise FileNotFoundError(f"Could not find generated image file for page {i}")
+        
         os.rename(old_name, new_name)
 
 def extract_text_from_pdf(pdf_path: Path, text_file: Path):
@@ -108,7 +127,7 @@ def create_json_output(assignment_id: str, assignment_dir: Path, pdf_basename: s
     """Create JSON metadata file."""
     json_data = {
         "assignment_id": assignment_id,
-        "solution_pdf_path": str(assignment_dir / pdf_basename),
+        "solution_pdf": str(assignment_dir / pdf_basename),
         "solution_text_path": str(text_file),
         "structure_hint_path": str(assignment_dir / structure_hint_basename),
         "solution_images": [
@@ -155,13 +174,13 @@ def read_structure_hint(hint_path: Path) -> str:
     print("    Structure hint loaded.")
     return hint
 
-def extract_markdown_from_pdf(pdf_path: Path, flash_model) -> str:
-    """Extract markdown from the PDF file using Gemini Flash model."""
+def extract_markdown_from_pdf(pdf_path: Path, pro_model) -> str:
+    """Extract markdown from the PDF file using Gemini Pro model."""
     print(f"[4/7] Uploading PDF file for extraction: {pdf_path} ...")
     pdf_file = genai.upload_file(str(pdf_path))
-    print("    PDF file uploaded. Generating markdown from PDF using Gemini Flash model...")
+    print("    PDF file uploaded. Generating markdown from PDF using Gemini Pro model...")
     start_time = time.time()
-    response = flash_model.generate_content(
+    response = pro_model.generate_content(
         [
             solution_extract_instruction,
             pdf_file
@@ -220,11 +239,11 @@ def process_and_parse_solution(args):
     create_directories(assignment_dir, pages_dir)
     
     # Move files
-    pdf_basename = args.solution_pdf_path.name
-    structure_hint_basename = args.structure_hint_path.name
+    pdf_basename = args.solution_pdf.name
+    structure_hint_basename = args.structure_hint.name
     
-    move_files(args.solution_pdf_path, assignment_dir / pdf_basename)
-    move_files(args.structure_hint_path, assignment_dir / structure_hint_basename)
+    move_files(args.solution_pdf, assignment_dir / pdf_basename)
+    move_files(args.structure_hint, assignment_dir / structure_hint_basename)
     
     # Process PDF
     pdf_path = assignment_dir / pdf_basename
@@ -255,9 +274,8 @@ def process_and_parse_solution(args):
     
     # Initialize models
     print("[*] Initializing Gemini models...")
-    flash_model = genai.GenerativeModel('gemini-2.5-flash-preview-04-17')
     pro_model = genai.GenerativeModel('gemini-2.5-pro-preview-05-06')
-    print("    Gemini models initialized.")
+    print("    Gemini Pro model initialized.")
 
     # Load metadata and structure hint
     solution_info = get_solution_metadata(assignment_dir)
@@ -265,7 +283,7 @@ def process_and_parse_solution(args):
 
     # Step 1: Extract markdown from PDF and save to file
     print("[3/7] Extracting markdown from PDF and saving to file...")
-    markdown_text = extract_markdown_from_pdf(Path(solution_info['solution_pdf_path']), flash_model)
+    markdown_text = extract_markdown_from_pdf(Path(solution_info['solution_pdf']), pro_model)
     markdown_path = assignment_dir / "extracted_solution_text.md"
     with open(markdown_path, 'w', encoding='utf-8') as f:
         f.write(markdown_text)
@@ -285,6 +303,9 @@ def process_and_parse_solution(args):
     print(f"Writing final solution to {output_path} ...")
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(final_text)
+    
+    # Update the JSON file with the parsed solution path
+    update_json_with_parsed_solution(assignment_dir, output_path)
     
     print(f"Solution written to {output_path}")
     print("========== Solution Processing and Parsing Complete ==========")

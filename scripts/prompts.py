@@ -3,7 +3,7 @@ Please parse and process the pdf file relating to the mathematics field. The fil
 """
 
 solution_parse_instruction = """
-The given markdown file is parsed from the text data from a pdf file relating to the mathematics field. The file represents a model solution for a course. The problem is that the parsed document lacks visual data and clues from the pdf which is extremely important for a math document. Please, referencing the markdown file, edit, correct and complete the parsed document using the visual data gained from the image files. Keep the original text as much as possible except for corrections and don't lose any information.
+The given markdown file is parsed from the text data from a pdf file relating to the mathematics field. The file represents a model solution for a course. The problem is that the parsed document lacks visual data and clues from the pdf which is extremely important for a math document. Please, referencing the markdown file, edit, correct and complete the parsed document using the visual data gained from the image files. Pay attention to extracting information from plots, diagrams, tables, and other visual elements with their details. Keep the original text as much as possible except for corrections and don't lose any information.
 """
 
 solution_parse_format_desc = """
@@ -53,8 +53,8 @@ This is a model solution document for the assignment and should be semantically 
 """
 
 submission_extract_and_parse_instruction = """
-Please parse and process the pdf file relating to the mathematics field. The file represents a submission for an asignment for a course. It contains mathematical equations and proofs and plots. Please extract all of the information in the file to the best of your ability and save the mathematical text as latex inside $$ tags in an overall markdown format.
-You have access to the textual data from the pdf file. The challenge is that the textual pdf data lacks visual data and clues from the pdf which is extremely important for a math document. For this please use the visual context from the images of the submission.
+Please parse and process the pdf file relating to the mathematics field. The file represents a submission for an assignment for a course. It contains mathematical equations and proofs and plots. Please extract all of the information in the file to the best of your ability and save the mathematical text as latex inside $$ tags in an overall markdown format.
+You have access to the textual data from the pdf file. The challenge is that the textual pdf data lacks visual data and clues from the pdf which is extremely important for a math document. For this please use the visual context from the images of the submission and include descriptions of visual elements like plots, diagrams, and handwritten work.
 It is very important that you only format the text and don't add in any other information because it will be used for grading. The contents of the submission may or may not be correct but must be parsed as is.
 """
 
