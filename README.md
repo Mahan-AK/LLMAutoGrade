@@ -142,10 +142,6 @@ First, process your model solutions to create the grading reference:
 - `solution_text.txt` - Plain text version
 - `pages/` - Directory with page images for visual analysis
 
-**Required files in the directory:**
-- `Assignment_0_Solution.pdf` (the model solution)
-- `structure_hint_assignment_0.txt` (grading structure)
-
 ## Structure Hint Files
 
 The structure hint file is crucial for defining how assignments are graded. It maps every gradable unit to its point value and ensures consistent grading across all submissions.
@@ -205,19 +201,6 @@ c) 0 points
 Exercise 1.3:
 0 points
 ```
-
-### **Key Points:**
-- **Indentation matters**: Use consistent indentation to show hierarchy
-- **Point allocation**: Every gradable unit must have points specified
-- **Flexibility**: You can override points from the PDF or add new gradable units
-- **Total calculation**: System automatically calculates total points per exercise
-
-### **Why Structure Hint Files Matter:**
-1. **Consistent grading**: Ensures all submissions are graded against the same structure
-2. **Point flexibility**: You can modify point values without changing the PDF
-3. **Grading automation**: LLM uses this structure to assign points systematically
-4. **Quality control**: Helps identify missing or incomplete student responses
-5. **Report generation**: Creates structured grading reports with point breakdowns
 
 ### Grade Submissions
 
@@ -353,75 +336,6 @@ The grading script (`process_submissions.py`) supports various options for custo
    - Failed submissions are logged and reported
    - Invalid submissions are moved to `#invalid_submissions/` folder
    - Comprehensive error reporting for debugging
-
-## Complete Workflow Example
-
-Here's a complete example of processing Assignment 0:
-
-### **Step 1: Prepare Input Files**
-```
-Model_Solutions/Assignment_0/
-├── Assignment_0_Solution.pdf          # Your model solution PDF
-└── structure_hint_assignment_0.txt    # Grading structure file
-```
-
-### **Step 2: Process the Solution**
-```bash
-./grade.sh solution Model_Solutions/Assignment_0/ $GEMINI_API_KEY
-```
-
-**This creates:**
-```
-Model_Solutions/Assignment_0/
-├── Assignment_0_Solution.pdf
-├── structure_hint_assignment_0.txt
-├── processed_solution_info.json       # ← Created for grading
-├── parsed_solution_0.md               # ← Structured solution
-├── extracted_solution_text.md         # ← Raw extracted text
-├── solution_text.txt                  # ← Plain text
-└── pages/                             # ← Page images
-    ├── model_solution_page_1.png
-    ├── model_solution_page_2.png
-    ├── model_solution_page_3.png
-    └── model_solution_page_4.png
-```
-
-### **Step 3: Grade Submissions**
-```bash
-./grade.sh grade Submissions/Assignment_0/ Model_Solutions/Assignment_0/ $GEMINI_API_KEY
-```
-
-**This processes each submission:**
-```
-Submissions/Assignment_0/Student_Name_12345/
-├── processed/                          # ← Preprocessing output
-│   ├── textual/                       # Extracted text files
-│   ├── visual/                        # Generated images
-│   └── preprocess_info.json
-├── parsed_submission.md               # ← LLM-parsed content
-├── grading_report.md                  # ← Detailed grading report
-├── grading_result.json                # ← Structured results
-└── grading_metadata.json              # ← Cost and timing data
-```
-
-## Submission Structure and Preprocessing
-
-### **Submission Directory Structure**
-```
-Submissions/Assignment_X/
-├── Student_Name_12345/                # Individual student submission
-│   ├── assignment.pdf                 # PDF submission
-│   ├── code.py                        # Python code
-│   ├── report.docx                    # Word document
-│   ├── notebook.ipynb                 # Jupyter notebook
-│   └── images/                        # Image files
-│       ├── plot1.png
-│       └── diagram.jpg
-├── Another_Student_67890/             # Another student
-│   ├── submission.zip                  # Compressed archive
-│   └── ...
-└── ...
-```
 
 ### **What the Preprocessing Handles**
 
